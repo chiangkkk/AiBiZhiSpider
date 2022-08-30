@@ -49,6 +49,9 @@ class AiBiZhiServer:
         while now * 20 < totalDownload:
             cateUrl = self.getDeclareCategoryUrl(now * 20)
             imageUrls = self.getImageUrl(cateUrl)
+            if len(imageUrls) == 0:
+                print("未加载到图片资源,程序结束")
+                exit(1)
             needSleep = False
             for imageUrl in imageUrls:
                 count += 1
