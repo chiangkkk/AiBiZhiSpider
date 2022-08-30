@@ -43,12 +43,14 @@ class AiBiZhiServer:
         while now * 20 < totalDownload:
             cateUrl = self.getDeclareCategoryUrl(now * 20)
             imageUrls = self.getImageUrl(cateUrl)
+            needSleep = False
             for imageUrl in imageUrls:
                 count += 1
-                self.downloadImage(imageUrl, count)
-            sleepTime = random.randint(5, 10)
-            print("休息{}s".format(sleepTime))
-            time.sleep(sleepTime)
+                needSleep = self.downloadImage(imageUrl, count)
+            if needSleep:
+                sleepTime = random.randint(5, 10)
+                print("休息{}s".format(sleepTime))
+                time.sleep(sleepTime)
 
             now += 1
 
@@ -85,8 +87,10 @@ class AiBiZhiServer:
     def downloadImage(self, imageUrl, count):
         print("正在处理{}张,图片地址:{}".format(count, imageUrl['img']))
         if os.path.exists('download/{}/{}.jpg'.format(self.cateName, imageUrl['id'])):
-            return
+            print("第{}张-{}.jpg已存在".format(count, imageUrl['id']))
+            return False
         print("开始下载{}张图片".format(count))
         resp = requests.get(imageUrl['img'], headers=self.downLoadImageHeader)
         with open('download/' + self.cateName + "/" + imageUrl['id'] + '.jpg', 'wb') as f:
             f.write(resp.content)
+        return True

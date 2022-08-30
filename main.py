@@ -21,7 +21,7 @@ if __name__ == '__main__':
         print("{}. {} 数量:{}".format(cateNum + 1, category['rname'], category['count']))
         cateNum += 1
 
-    userCate = getUserDigitInptup('请输入需要下载分类的序号', 1, 18)
+    userCate = getUserDigitInptup('请输入需要下载分类的序号:', 1, 18)
     userCate -= 1
 
     userNum = getUserDigitInptup("请输入你要下载的数量(0-99999)", 0, 99999)
