@@ -12,6 +12,7 @@ class AiBiZhiServer:
     category = '/4e4d610cdf714d2966000000'
     wallpaper = '/wallpaper'
     skip = 20
+    saveImgPath = './download'
     nowCateName = ''
     headers = {
         "User-Agent": "(picasso,170,windows)",
@@ -36,14 +37,18 @@ class AiBiZhiServer:
         :param cateNum 分类参数
         :param totalDownload 总下载数
         :param userSleep 是否下载时睡眠
-        :rtype: void 无返回
+        :rtype void 无返回
         """
+        saveImgPath = os.getenv('saveImgPath')
+        print(saveImgPath)
+        if saveImgPath:
+            self.saveImgPath = saveImgPath
         self.cateInfo = self.categoryList[cateNum]
         self.totalCount = self.cateInfo['count']
         self.cateName = self.cateInfo['name']
         self.cateId = self.cateInfo['id']
-        if os.path.exists('./download/{}'.format(self.cateName)) is False:
-            os.mkdir('./download/{}'.format(self.cateName))
+        if os.path.exists(self.saveImgPath + '/{}'.format(self.cateName)) is False:
+            os.mkdir(self.saveImgPath + '/{}'.format(self.cateName))
         now = 0
         count = 0;
         while now * 20 < totalDownload:
@@ -95,7 +100,7 @@ class AiBiZhiServer:
 
     def downloadImage(self, imageUrl, count):
         print("正在处理{}张,图片地址:{}".format(count, imageUrl['img']))
-        if os.path.exists('download/{}/{}.jpg'.format(self.cateName, imageUrl['id'])):
+        if os.path.exists(self.saveImgPath + '/{}/{}.jpg'.format(self.cateName, imageUrl['id'])):
             print("第{}张-{}.jpg已存在".format(count, imageUrl['id']))
             return False
         print("开始下载{}张图片".format(count))
@@ -107,6 +112,6 @@ class AiBiZhiServer:
                     break
             except Exception as e:
                 print(e.with_traceback())
-        with open('download/' + self.cateName + "/" + imageUrl['id'] + '.jpg', 'wb') as f:
+        with open(self.saveImgPath + '/' + self.cateName + "/" + imageUrl['id'] + '.jpg', 'wb') as f:
             f.write(resp.content)
         return True
