@@ -41,16 +41,18 @@ class AiBiZhiServer:
         """
         saveImgPath = os.getenv('saveImgPath')
         print(saveImgPath)
-        if saveImgPath:
+        if saveImgPath is not None:
             self.saveImgPath = saveImgPath
         self.cateInfo = self.categoryList[cateNum]
         self.totalCount = self.cateInfo['count']
         self.cateName = self.cateInfo['name']
         self.cateId = self.cateInfo['id']
-        if os.path.exists(self.saveImgPath + '/{}'.format(self.cateName)) is False:
-            os.mkdir(self.saveImgPath + '/{}'.format(self.cateName))
+        self.downloadCount = 0
+        self.totalDownloadCount = totalDownload
+        savePath = '{}/{}'.format(self.saveImgPath, self.cateName)
+        if os.path.exists(savePath) is False:
+            os.makedirs(savePath)
         now = 0
-        count = 0;
         while now * 20 < totalDownload:
             cateUrl = self.getDeclareCategoryUrl(now * 20)
             imageUrls = self.getImageUrl(cateUrl)
@@ -59,8 +61,8 @@ class AiBiZhiServer:
                 exit(1)
             needSleep = False
             for imageUrl in imageUrls:
-                count += 1
-                needSleep = self.downloadImage(imageUrl, count)
+                self.downloadCount += 1
+                needSleep = self.downloadImage(imageUrl)
             if needSleep and userSleep:
                 sleepTime = random.randint(5, 10)
                 print("休息{}s".format(sleepTime))
@@ -98,12 +100,14 @@ class AiBiZhiServer:
         print("get ImageUrls {}".format(imageUrls))
         return imageUrls
 
-    def downloadImage(self, imageUrl, count):
-        print("正在处理{}张,图片地址:{}".format(count, imageUrl['img']))
+    def downloadImage(self, imageUrl):
+        if self.downloadCount > self.totalDownloadCount:
+            return;
+        print("正在处理{}张,图片地址:{}".format(self.downloadCount, imageUrl['img']))
         if os.path.exists(self.saveImgPath + '/{}/{}.jpg'.format(self.cateName, imageUrl['id'])):
-            print("第{}张-{}.jpg已存在".format(count, imageUrl['id']))
+            print("第{}张-{}.jpg已存在".format(self.downloadCount, imageUrl['id']))
             return False
-        print("开始下载{}张图片".format(count))
+        print("开始下载{}张图片".format(self.downloadCount))
         resp = None
         while True:
             try:
