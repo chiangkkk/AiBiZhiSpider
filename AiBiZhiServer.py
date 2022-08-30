@@ -31,7 +31,13 @@ class AiBiZhiServer:
     def __init__(self):
         pass
 
-    def run(self, cateNum, totalDownload):
+    def run(self, cateNum, totalDownload, userSleep=False):
+        """
+        :param cateNum 分类参数
+        :param totalDownload 总下载数
+        :param userSleep 是否下载时睡眠
+        :rtype: void 无返回
+        """
         self.cateInfo = self.categoryList[cateNum]
         self.totalCount = self.cateInfo['count']
         self.cateName = self.cateInfo['name']
@@ -47,7 +53,7 @@ class AiBiZhiServer:
             for imageUrl in imageUrls:
                 count += 1
                 needSleep = self.downloadImage(imageUrl, count)
-            if needSleep:
+            if needSleep and userSleep:
                 sleepTime = random.randint(5, 10)
                 print("休息{}s".format(sleepTime))
                 time.sleep(sleepTime)
@@ -90,7 +96,14 @@ class AiBiZhiServer:
             print("第{}张-{}.jpg已存在".format(count, imageUrl['id']))
             return False
         print("开始下载{}张图片".format(count))
-        resp = requests.get(imageUrl['img'], headers=self.downLoadImageHeader)
+        resp = None
+        while True:
+            try:
+                resp = requests.get(imageUrl['img'], headers=self.downLoadImageHeader)
+                if resp.status_code == 200:
+                    break
+            except Exception as e:
+                print(e.with_traceback())
         with open('download/' + self.cateName + "/" + imageUrl['id'] + '.jpg', 'wb') as f:
             f.write(resp.content)
         return True
