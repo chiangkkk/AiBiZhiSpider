@@ -105,16 +105,16 @@ class AiBiZhiServer:
             return;
         print("正在处理{}张,图片地址:{}".format(self.downloadCount, imageUrl['img']))
         if os.path.exists(self.saveImgPath + '/{}/{}.jpg'.format(self.cateName, imageUrl['id'])):
-            print("第{}张-{}.jpg已存在".format(self.downloadCount, imageUrl['id']))
+            print("第{}张 {}.jpg已存在".format(self.downloadCount, imageUrl['id']))
             return False
         print("开始下载{}张图片".format(self.downloadCount))
-        resp = None
         while True:
             try:
                 resp = requests.get(imageUrl['img'], headers=self.downLoadImageHeader)
                 if resp.status_code == 200:
                     break
             except Exception as e:
+                print("下载发生异常,正在进行重试")
                 print(e.with_traceback())
         with open(self.saveImgPath + '/' + self.cateName + "/" + imageUrl['id'] + '.jpg', 'wb') as f:
             f.write(resp.content)
