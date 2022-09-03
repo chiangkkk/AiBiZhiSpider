@@ -30,7 +30,13 @@ class AiBiZhiServer:
     }
 
     def __init__(self):
-        pass
+        self.categoryList = None
+        self.cateInfo = None
+        self.totalCount = None
+        self.cateName = None
+        self.cateId = None
+        self.downloadCount = None
+        self.totalDownloadCount = None
 
     def run(self, cateNum, totalDownload, userSleep=False):
         """
