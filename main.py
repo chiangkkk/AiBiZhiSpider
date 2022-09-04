@@ -25,5 +25,5 @@ if __name__ == '__main__':
     userCate -= 1
 
     userNum = getUserDigitInptup("请输入你要下载的数量(0-99999):", 0, 99999)
-    server.run(userCate, userNum, False)
+    server.run(userCate, userNum)
     print("程序运行完成")
