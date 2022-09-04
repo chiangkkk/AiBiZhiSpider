@@ -1,7 +1,6 @@
 import random
-import threading
-from queue import Queue
-
+from multiprocessing import JoinableQueue as Queue
+from multiprocessing import Process
 import requests
 import json
 import os
@@ -66,15 +65,15 @@ class AiBiZhiServer:
         task = []
         # 2个线程获取imageUrls
         for i in range(5):
-            task.append(Thread(target=self.pushQueueImageUrl))
+            task.append(Process(target=self.pushQueueImageUrl))
 
         for i in range(threadCount):
-            task.append(Thread(target=self.customImageUrl))
+            task.append(Process(target=self.customImageUrl))
         for i in task:
-            # i.daemon = True
-            i.start()
-            i.join()
-        print("test")
+            i.daemon = True
+            i.run()
+            # i.join()
+
         # self.downloadImgUrls.join()
 
     def getCategoreyUrl(self):
@@ -128,8 +127,9 @@ class AiBiZhiServer:
     def downloadImage(self, imageUrl):
         if self.downloadCount > self.totalDownloadCount:
             return;
-        t = threading.current_thread()
-        print("Thread id : {},正在处理{}张,图片地址:{}".format(t.ident, self.downloadCount, imageUrl['img']))
+        # t = threading.current_thread()
+        t = os.getpid()
+        print("Thread id : {},正在处理{}张,图片地址:{}".format(t, self.downloadCount, imageUrl['img']))
         if os.path.exists(self.saveImgPath + '/{}/{}.jpg'.format(self.cateName, imageUrl['id'])):
             print("第{}张 {}.jpg已存在".format(self.downloadCount, imageUrl['id']))
             with self.countLock:
